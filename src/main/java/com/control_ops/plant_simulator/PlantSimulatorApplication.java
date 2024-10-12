@@ -10,4 +10,4 @@ public class PlantSimulatorApplication {
 		SpringApplication.run(PlantSimulatorApplication.class, args);
 	}
 
-}
+
