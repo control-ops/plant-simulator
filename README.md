@@ -1,6 +1,6 @@
 # Plant Simulator
 
-Simulates continuous processes and their control dynamics.
+Simulates the behaviour and control dynamics of continuous processes.
 
 ## Project Setup
 
