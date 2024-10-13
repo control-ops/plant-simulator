@@ -9,5 +9,4 @@ public class PlantSimulatorApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(PlantSimulatorApplication.class, args);
 	}
-
-
+}

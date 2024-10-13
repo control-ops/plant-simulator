@@ -50,7 +50,6 @@ jobs:
     #   run: gradle build
 
   dependency-submission:
-    name: Check dependencies
     runs-on: ubuntu-latest
     permissions:
       contents: write
