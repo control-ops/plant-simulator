@@ -1,4 +1,9 @@
 package com.control_ops.plant_simulator.sensor;
 
-public record Measurement (double measuredQuantity, MeasurementUnit measurementUnit) {
+import java.time.ZonedDateTime;
+
+public record Measurement (
+        double quantity,
+        MeasurementUnit unit,
+        ZonedDateTime dateTime) {
 }
