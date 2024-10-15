@@ -3,48 +3,36 @@ package com.control_ops.plant_simulator.sensor;
 import java.security.SecureRandom;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class Sensor {
-    private long measurementCount = 0;
     private boolean isMeasuring = false;
-
     private final long samplingPeriod;
-    private final Buffer<Measurement> buffer;
+    private final TimeUnit samplingPeriodUnit;
     private final MeasurementUnit measurementUnit;
     private final SecureRandom random = new SecureRandom();
     private final ScheduledExecutorService scheduler;
+    private final List<SensorListener> sensorListeners = new ArrayList<>();
 
     /**
      * Initializes a new sensor object.
      * @param samplingPeriod How often the sensor should record a new measurement, in milliseconds
      * @param measurementUnit The measurement unit of data gathered by the sensor
      */
-    public Sensor(
-            final long samplingPeriod,
-            final MeasurementUnit measurementUnit,
-            final long bufferCapacity) {
+    public Sensor(final long samplingPeriod, final TimeUnit samplingPeriodUnit, final MeasurementUnit measurementUnit) {
         this.samplingPeriod = samplingPeriod;
+        this.samplingPeriodUnit = samplingPeriodUnit;
         this.measurementUnit = measurementUnit;
-        this.buffer = new Buffer<>(bufferCapacity);
         this.scheduler = Executors.newScheduledThreadPool(1);
-    }
-
-    private synchronized void takeMeasurement() {
-        final Measurement newMeasurement = new Measurement(
-                random.nextDouble(),
-                this.measurementUnit,
-                ZonedDateTime.now(ZoneId.of("UTC")));
-        this.buffer.add(newMeasurement);
-        this.measurementCount++;
     }
 
     public void startMeasuring() {
         if (!isMeasuring) {
-            this.scheduler.scheduleAtFixedRate(this::takeMeasurement, 0L, this.samplingPeriod, TimeUnit.MILLISECONDS);
+            this.scheduler.scheduleAtFixedRate(this::takeMeasurement, 0L, this.samplingPeriod, this.samplingPeriodUnit);
             this.isMeasuring = true;
         }
     }
@@ -56,11 +44,21 @@ public class Sensor {
         }
     }
 
-    public long getMeasurementCount() {
-        return this.measurementCount;
+    public void addListener(final SensorListener sensorListener) {
+        this.sensorListeners.add(sensorListener);
     }
 
-    public List<Measurement> getMeasurements() {
-        return this.buffer.exportCopy();
+    public void removeListener(final SensorListener sensorListener) {
+        this.sensorListeners.remove(sensorListener);
+    }
+
+    private synchronized void takeMeasurement() {
+        final Measurement newMeasurement = new Measurement(
+                random.nextDouble(),
+                this.measurementUnit,
+                ZonedDateTime.now(ZoneId.of("UTC")));
+        for (final SensorListener listener : this.sensorListeners) {
+            listener.onMeasurement(newMeasurement);
+        }
     }
 }
