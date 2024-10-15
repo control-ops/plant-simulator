@@ -134,7 +134,7 @@ class SensorTest {
      * The error depends on non-deterministic threading behaviour; the error is therefore calculated over a large number
      * of measurements and compared to a threshold to smooth out the results.
      * @param expectedSamplingPeriod The sampling period to be set on the sensor
-     * @param mininmumMeasurements The minimum number of measurements required to calculate the fractional error
+     * @param minimumMeasurements The minimum number of measurements required to calculate the fractional error
      * @param maxFractionalError The maximum tolerable fractional error between the expected and actual sampling periods
      */
     @ParameterizedTest
@@ -146,14 +146,14 @@ class SensorTest {
     })
     void testSamplingPeriod(
             final long expectedSamplingPeriod,
-            final long mininmumMeasurements,
+            final long minimumMeasurements,
             final double maxFractionalError) {
         this.samplingPeriod = expectedSamplingPeriod;
         final Sensor sensor = new Sensor(samplingPeriod, samplingTimeUnit, MeasurementUnit.CELSIUS);
         sensor.addListener(measurementList);
 
         sensor.startMeasuring();
-        await().atMost(60, TimeUnit.SECONDS).until(() -> measurements.size() >= mininmumMeasurements);
+        await().atMost(60, TimeUnit.SECONDS).until(() -> measurements.size() >= minimumMeasurements);
         sensor.stopMeasuring();
 
         final Measurement firstMeasurement = measurements.getFirst();
