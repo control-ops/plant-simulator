@@ -26,7 +26,7 @@ class SensorTest {
     final TimeUnit samplingTimeUnit = TimeUnit.MILLISECONDS;
 
     /**
-     * Causes the calling thread to wait until measurements are received, or throws an exception.
+     * Causes the calling thread to wait until at least one measurement is received.
      */
     private void waitForMeasurements() {
         await().atMost(10*samplingPeriod, samplingTimeUnit).until(() -> !measurements.isEmpty());
@@ -102,6 +102,26 @@ class SensorTest {
         sensor.stopMeasuring();
         for (int i = 1; i < measurements.size(); i++) {
             assertThat(measurements.get(i - 1)).isNotEqualTo(measurements.get(i));
+        }
+    }
+
+    /**
+     * Ensures that the sensor takes measurements in chronological order.
+     */
+    @Test
+    void testMeasurementSequence() {
+        final long minimumMeasurements = 100L;
+        final Sensor sensor = new Sensor(samplingPeriod, samplingTimeUnit, MeasurementUnit.CELSIUS);
+        sensor.addListener(measurementList);
+
+        sensor.startMeasuring();
+        await().atMost(10, TimeUnit.SECONDS).until(() -> measurements.size() >= minimumMeasurements);
+        sensor.stopMeasuring();
+        for (int i = 1; i < measurements.size(); i++) {
+            final long elapsedTime = Duration.between(
+                    measurements.get(i - 1).dateTime(),
+                    measurements.get(i).dateTime()).toMillis();
+            assertThat(elapsedTime).isPositive();
         }
     }
 
