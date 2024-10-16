@@ -64,7 +64,7 @@ class SensorTest {
     }
 
     /**
-     * Tests that the sensor's addListener() method ensures that the observer starts receiving measurements.
+     * Tests that the sensor's addListener() method causes the observer to start receiving measurements.
      */
     @Test
     void testAddListener() {
@@ -76,7 +76,7 @@ class SensorTest {
     }
 
     /**
-     * Tests that the sensor's removeObserver method ensures that the observer no longer receives measurements.
+     * Tests that the sensor's removeObserver method causes the observer to stop receiving measurements.
      */
     @Test
     void testRemoveListener() {
@@ -89,7 +89,7 @@ class SensorTest {
     }
 
     /**
-     * Ensures that the sensor actually takes unique measurements.
+     * Tests that the sensor actually takes unique measurements.
      */
     @Test
     void testTakeMeasurement() {
@@ -106,7 +106,7 @@ class SensorTest {
     }
 
     /**
-     * Ensures that the sensor takes measurements in chronological order.
+     * Tests that the sensor takes measurements in chronological order.
      */
     @Test
     void testMeasurementSequence() {
